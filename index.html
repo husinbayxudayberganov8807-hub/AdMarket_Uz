@@ -6,126 +6,117 @@
     <title>AdMarket Uz</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Eng birinchi holatdagi oddiy dizayn */
         body { background-color: #050a18; color: white; font-family: sans-serif; margin: 0; padding: 15px; text-align: center; }
         
-        /* Yuqori qism: Balans */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #0f172a; padding: 10px; border-radius: 12px; }
-        .diamond { color: #00d2ff; font-weight: bold; font-size: 18px; }
+        .balance-box { background: #0f172a; padding: 20px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #1e293b; }
+        .diamond-count { font-size: 32px; font-weight: bold; color: #00d2ff; }
+        
+        /* Vazifalar bo'limi (Mavjud va Yaratish) */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 10px; background: #0f172a; color: white; border: 1px solid #1e293b; border-radius: 8px; }
+        .tab-btn.active { background: #00d2ff; color: black; }
 
-        /* Bo'limlar */
-        .section { display: none; }
-        .active { display: block; }
+        .content { display: none; }
+        .content.active { display: block; }
 
-        /* Vazifa kartochkalari */
-        .task-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-go { background: #00d2ff; color: black; border: none; padding: 5px 15px; border-radius: 5px; font-weight: bold; }
+        /* Vazifa kartochkasi */
+        .task-card { background: #0f172a; padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border: 1px solid #1e293b; }
+        .btn-go { background: #00d2ff; color: black; border: none; padding: 8px 15px; border-radius: 5px; font-weight: bold; }
 
-        /* Yaratish formasi (Sodda) */
-        .form-group { text-align: left; margin-top: 15px; }
-        input { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1120; color: white; box-sizing: border-box; }
-        .btn-send { width: 100%; background: #00ff00; color: black; padding: 12px; border: none; border-radius: 8px; margin-top: 15px; font-weight: bold; }
+        /* Yaratish formasi */
+        .form-group { text-align: left; margin-bottom: 15px; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1e293b; background: #0b1120; color: white; box-sizing: border-box; }
+        .btn-send { width: 100%; background: #00ff00; color: black; padding: 15px; border: none; border-radius: 10px; font-weight: bold; }
 
-        /* Pastki menyu */
-        .nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #0f172a; display: flex; border-top: 1px solid #1e293b; }
-        .nav-btn { flex: 1; padding: 15px; color: #64748b; cursor: pointer; }
-        .nav-btn.active { color: #00d2ff; border-top: 2px solid #00d2ff; }
+        /* Profil */
+        .profile-card { background: #0f172a; padding: 20px; border-radius: 15px; text-align: left; }
     </style>
 </head>
 <body>
 
-    <div class="top-bar">
-        <span>AdMarket Uz</span>
-        <span class="diamond">💎 <span id="user-bal">0</span></span>
+    <div class="balance-box">
+        <div class="diamond-count">💎 <span id="bal-display">0</span></div>
+        <p style="margin: 5px 0; color: #64748b;">Sizning olmoslaringiz</p>
     </div>
 
-    <div id="tasks" class="section active">
+    <div class="tabs">
+        <button class="tab-btn active" onclick="showPage('tasks-page', this)">Vazifalar</button>
+        <button class="tab-btn" onclick="showPage('profile-page', this)">Profil</button>
+    </div>
+
+    <div id="tasks-page" class="content active">
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button onclick="showTab('mavjud')" id="btn-m" style="flex:1; padding:10px;">Mavjud</button>
-            <button onclick="showTab('yaratish')" id="btn-y" style="flex:1; padding:10px;">Yaratish</button>
+            <button onclick="showSubTab('mavjud')" style="flex:1;">Mavjud</button>
+            <button onclick="showSubTab('yaratish')" style="flex:1;">Yaratish</button>
         </div>
 
-        <div id="mavjud">
+        <div id="mavjud-box">
             <div class="task-card">
-                <div><b>@AdMarket_Uz</b><br><small>+10 olmos</small></div>
+                <div><b>@AdMarket_Uz</b><br><small>+10 💎</small></div>
                 <button class="btn-go" onclick="window.location.href='https://t.me/AdMarket_Uz'">O'tish</button>
             </div>
         </div>
 
-        <div id="yaratish" style="display:none;">
+        <div id="yaratish-box" style="display:none;">
             <div class="form-group">
-                <label>Kanal linki:</label>
-                <input type="text" id="c-link" placeholder="@kanal">
+                <label>Kanal nomi (@username):</label>
+                <input type="text" id="inp-link" placeholder="@kanal">
             </div>
             <div class="form-group">
-                <label>Odam soni:</label>
-                <input type="number" id="c-count" placeholder="30" oninput="recalc()">
+                <label>Nechta odam kerak?</label>
+                <input type="number" id="inp-count" oninput="calc()">
             </div>
-            <p>Jami narx: <span id="c-price">0</span> 💎</p>
-            <button class="btn-send" onclick="sendTask()">YUBORISH</button>
+            <p>Narxi: <span id="out-price">0</span> 💎</p>
+            <button class="btn-send" onclick="submit()">YUBORISH</button>
         </div>
     </div>
 
-    <div id="profile" class="section">
-        <div style="background: #0f172a; padding: 20px; border-radius: 15px;">
-            <h3 id="u-name">Foydalanuvchi</h3>
-            <p id="u-id" style="color: #64748b;">ID: 00000</p>
-            <hr border="0.1">
-            <p>Sizning balansingiz: <b id="p-bal">0</b> 💎</p>
-            <button onclick="share()" style="background:#00d2ff; border:none; padding:10px; border-radius:5px; width:100%;">Do'stlarni taklif qilish (+80 💎)</button>
+    <div id="profile-page" class="content">
+        <div class="profile-card">
+            <h2 id="u-name">Ism</h2>
+            <p id="u-id">ID: 00000</p>
+            <button onclick="inv()" style="width:100%; padding:10px; background:#00d2ff; border:none; border-radius:8px;">Do'stlarni taklif qilish (+80 💎)</button>
         </div>
-    </div>
-
-    <div class="nav">
-        <div class="nav-btn active" onclick="nav('tasks', this)">Vazifalar</div>
-        <div class="nav-btn" onclick="nav('profile', this)">Profil</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        
-        const params = new URLSearchParams(window.location.search);
-        let bal = params.get('bal') || 0;
-        document.getElementById('user-bal').innerText = bal;
-        document.getElementById('p-bal').innerText = bal;
+        const p = new URLSearchParams(window.location.search);
+        let b = p.get('bal') || 0;
+
+        document.getElementById('bal-display').innerText = b;
         document.getElementById('u-name').innerText = tg.initDataUnsafe.user?.first_name;
         document.getElementById('u-id').innerText = "ID: " + tg.initDataUnsafe.user?.id;
 
-        function nav(id, el) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        function showPage(id, btn) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
             document.getElementById(id).classList.add('active');
-            el.classList.add('active');
+            btn.classList.add('active');
         }
 
-        function showTab(t) {
-            if(t == 'mavjud') {
-                document.getElementById('mavjud').style.display = 'block';
-                document.getElementById('yaratish').style.display = 'none';
-            } else {
-                document.getElementById('mavjud').style.display = 'none';
-                document.getElementById('yaratish').style.display = 'block';
-            }
+        function showSubTab(t) {
+            document.getElementById('mavjud-box').style.display = t=='mavjud'?'block':'none';
+            document.getElementById('yaratish-box').style.display = t=='yaratish'?'block':'none';
         }
 
-        function recalc() {
-            let c = document.getElementById('c-count').value;
-            document.getElementById('c-price').innerText = c * 5;
+        function calc() {
+            let n = document.getElementById('inp-count').value;
+            document.getElementById('out-price').innerText = n * 5;
         }
 
-        function sendTask() {
-            let link = document.getElementById('c-link').value;
-            let count = document.getElementById('c-count').value;
-            let total = count * 5;
-            
-            if(total > bal) { tg.showAlert("Olmos yetmaydi!"); return; }
-            
-            tg.sendData(JSON.stringify({action: "create", link: link, count: count, price: total}));
+        function submit() {
+            let l = document.getElementById('inp-link').value;
+            let n = document.getElementById('inp-count').value;
+            if(n*5 > b) { tg.showAlert("Olmos yetmaydi!"); return; }
+            tg.sendData(JSON.stringify({link:l, count:n, price:n*5}));
         }
 
-        function share() {
+        function inv() {
             let link = "https://t.me/AdMarket_Uzbot?start=" + tg.initDataUnsafe.user.id;
-            tg.openTelegramLink("https://t.me/share/url?url=" + encodeURIComponent(link) + "&text=Olmos yig'ing!");
+            tg.openTelegramLink("https://t.me/share/url?url="+encodeURIComponent(link));
         }
     </script>
 </body>
