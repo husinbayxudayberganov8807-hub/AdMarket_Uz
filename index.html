@@ -6,100 +6,175 @@
     <title>AdMarket Uz</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            background-color: #050a18;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0; padding: 15px;
-            text-align: center;
-        }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .balance { 
-            background: #0f172a; padding: 8px 15px; border-radius: 20px; 
-            border: 1px solid #00d2ff; font-weight: bold; font-size: 14px;
-        }
-        .section-title { text-align: left; font-size: 14px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
+        :root { --bg: #050a1e; --card: #0f172a; --primary: #00d2ff; --accent: #00ff00; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'sans-serif'; margin: 0; padding: 0; }
         
-        .task-card {
-            background: #0f172a; border: 1px solid #1e293b; border-radius: 15px;
-            padding: 15px; margin-bottom: 12px; display: flex;
-            justify-content: space-between; align-items: center;
-            cursor: pointer;
+        /* Pastki menyu */
+        .bottom-nav {
+            position: fixed; bottom: 0; width: 100%; background: var(--card);
+            display: flex; justify-content: space-around; padding: 10px 0;
+            border-top: 1px solid #1e293b; z-index: 100;
         }
-        .task-info { text-align: left; }
-        .task-name { display: block; font-weight: bold; font-size: 15px; }
-        .task-reward { color: #00ff00; font-size: 13px; }
+        .nav-item { color: #64748b; font-size: 12px; text-decoration: none; text-align: center; flex: 1; cursor: pointer; }
+        .nav-item.active { color: var(--primary); }
 
-        .footer {
-            position: fixed; bottom: 0; left: 0; width: 100%;
-            background: #0a1120; display: flex; justify-content: space-around;
-            padding: 15px 0; border-top: 1px solid #1e293b;
-        }
-        .nav-item { font-size: 12px; color: #64748b; }
-        .nav-item.active { color: #00d2ff; }
+        /* Sahifalar */
+        .page { display: none; padding: 20px; padding-bottom: 80px; }
+        .page.active { display: block; }
+
+        /* Profil Dizayni (Rasmdagidek) */
+        .profile-header { text-align: center; margin-bottom: 30px; }
+        .user-avatar { width: 80px; height: 80px; background: var(--primary); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: bold; }
+        .user-id { font-size: 14px; color: #64748b; }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .info-card { background: var(--card); padding: 15px; border-radius: 15px; border: 1px solid #1e293b; text-align: center; }
+        .info-value { display: block; font-size: 20px; font-weight: bold; color: var(--primary); }
+        .info-label { font-size: 12px; color: #64748b; }
+
+        /* Vazifa Tablari */
+        .task-tabs { display: flex; background: var(--card); border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+        .t-tab { flex: 1; padding: 8px; text-align: center; border-radius: 8px; cursor: pointer; }
+        .t-tab.active { background: var(--primary); color: #000; font-weight: bold; }
+
+        /* Yaratish Formasi */
+        .input-group { text-align: left; margin-bottom: 15px; }
+        input { width: 100%; background: #0b1120; border: 1px solid #1e293b; padding: 12px; border-radius: 10px; color: white; margin-top: 5px; box-sizing: border-box; }
+        .btn-main { width: 100%; background: var(--primary); color: #000; border: none; padding: 15px; border-radius: 12px; font-weight: bold; font-size: 16px; margin-top: 10px; cursor: pointer; }
         
-        .invite-banner {
-            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
-            border-radius: 15px; padding: 20px; margin-bottom: 25px;
-            color: white; font-weight: bold;
-        }
+        .total-price { font-size: 18px; color: var(--accent); margin: 10px 0; }
     </style>
 </head>
 <body>
-    <div class="header">
-        <b style="color: #00d2ff; font-size: 18px;">ADMARKET UZ</b>
-        <div class="balance">💎 <span id="diamond-count">0</span> | 🪙 0</div>
-    </div>
 
-    <div class="invite-banner" onclick="shareInvite()">
-        🚀 DO'STLARNI TAKLIF QILISH<br>
-        <span style="font-size: 12px;">Har bir do'st uchun +80 💎 Do'stinggizga +30 💎</span>
-    </div>
-
-    <div class="section-title">Kunlik Vazifalar</div>
-
-    <div class="task-card" onclick="openLink('https://t.me/AdMarket_Uz')">
-    <div class="task-info">
-        <span class="task-name">📢 Kanalga a'zo bo'lish</span>
-        <span class="task-reward">+10 olmos</span>
-    </div>
-    <span>➜</span>
-    </div>
-
-    <div class="task-card" onclick="tgAlert('Tez kunda reklama qo\'shiladi')">
-        <div class="task-info">
-            <span class="task-name">📺 Reklama ko'rish</span>
-            <span class="task-reward">+10 olmos</span>
+    <div id="tasks-page" class="page active">
+        <div class="task-tabs">
+            <div class="t-tab active" onclick="switchTaskTab('mavjud')">Mavjud</div>
+            <div class="t-tab" onclick="switchTaskTab('yaratish')">Yaratish</div>
         </div>
-        <span>➜</span>
+
+        <div id="mavjud-list">
+            <h3 style="text-align: left;">Mavjud vazifalar</h3>
+            <p style="color: #64748b;">Hozircha vazifalar yo'q...</p>
+        </div>
+
+        <div id="yaratish-form" style="display: none;">
+            <div class="input-group">
+                <label>Kanal manzili</label>
+                <input type="text" id="channel-url" placeholder="@kanal_nomi">
+            </div>
+            <div class="input-group">
+                <label>Odam soni</label>
+                <input type="number" id="sub-count" placeholder="0" oninput="updateTotal()">
+            </div>
+            <div class="total-price">Jami: <span id="price-display">0</span> 💎</div>
+            <button class="btn-main" onclick="sendCreateRequest()">Vazifa yaratish</button>
+        </div>
     </div>
 
-    <div class="footer">
-        <div class="nav-item active">🚀<br>Boost</div>
-        <div class="nav-item" onclick="tgAlert('Ishlash bo\'limi')">💎<br>Ishlash</div>
-        <div class="nav-item" onclick="tgAlert('Profil bo\'limi')">👤<br>Profil</div>
+    <div id="profile-page" class="page">
+        <div class="profile-header">
+            <div class="user-avatar" id="avatar-char">U</div>
+            <h2 id="user-name" style="margin: 5px 0;">Foydalanuvchi</h2>
+            <span class="user-id" id="display-id">ID: 00000000</span>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <span class="info-value" id="p-balance">0</span>
+                <span class="info-label">Balans (💎)</span>
+            </div>
+            <div class="info-card" onclick="shareRef()">
+                <span class="info-value" style="color: var(--accent);">+80</span>
+                <span class="info-label">Do'stlarni taklif qilish</span>
+            </div>
+        </div>
     </div>
-    
-<script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
 
-    const urlParams = new URLSearchParams(window.location.search);
-    let balance = urlParams.get('bal') || 0;
-    document.getElementById("diamond-count").innerText = balance;
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="showPage('tasks-page', this)">
+            <div>📋</div><span>Vazifalar</span>
+        </div>
+        <div class="nav-item" onclick="showPage('profile-page', this)">
+            <div>👤</div><span>Profil</span>
+        </div>
+    </div>
 
-    function openLink(url) {
-        tg.openTelegramLink(url);
-        tg.HapticFeedback.notificationOccurred('success');
-        tg.showAlert("Kanalga a'zo bo'ling va botga qaytib /start bosing, shunda +10 💎 qo'shiladi!");
-    }
-    
-    function shareInvite() {
-        let userId = tg.initDataUnsafe.user.id;
-        let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
-        let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=Tezroq kiring, olmos yig'ing!";
-        tg.openTelegramLink(shareUrl);
-    }
-</script>
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        let balance = parseInt(urlParams.get('bal')) || 0;
+
+        // Ma'lumotlarni to'ldirish
+        document.getElementById('p-balance').innerText = balance;
+        document.getElementById('user-name').innerText = tg.initDataUnsafe.user?.first_name || "User";
+        document.getElementById('display-id').innerText = "ID: " + tg.initDataUnsafe.user?.id;
+        document.getElementById('avatar-char').innerText = (tg.initDataUnsafe.user?.first_name || "U")[0];
+
+        function showPage(pageId, el) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            el.classList.add('active');
+        }
+
+        function switchTaskTab(type) {
+            document.querySelectorAll('.t-tab').forEach(t => t.classList.remove('active'));
+            if(type === 'mavjud') {
+                document.getElementById('mavjud-list').style.display = 'block';
+                document.getElementById('yaratish-form').style.display = 'none';
+                event.target.classList.add('active');
+            } else {
+                document.getElementById('mavjud-list').style.display = 'none';
+                document.getElementById('yaratish-form').style.display = 'block';
+                event.target.classList.add('active');
+            }
+        }
+
+        function updateTotal() {
+            let count = document.getElementById('sub-count').value;
+            let total = count * 5;
+            document.getElementById('price-display').innerText = total;
+            
+            let btn = document.querySelector('.btn-main');
+            if(total > balance) {
+                btn.style.background = "#ff4444";
+                btn.innerText = "Mablag' yetarli emas";
+            } else {
+                btn.style.background = "#00d2ff";
+                btn.innerText = "Vazifa yaratish";
+            }
+        }
+
+        function sendCreateRequest() {
+            let link = document.getElementById('channel-url').value;
+            let count = document.getElementById('sub-count').value;
+            let total = count * 5;
+
+            if (total > balance) {
+                tg.showAlert("Olmosingiz yetarli emas!");
+                return;
+            }
+            if (!link.startsWith('@')) {
+                tg.showAlert("Kanal linkini @ bilan kiriting!");
+                return;
+            }
+
+            tg.sendData(JSON.stringify({
+                action: "create_task",
+                link: link,
+                amount: count,
+                price: total
+            }));
+        }
+
+        function shareRef() {
+            let id = tg.initDataUnsafe.user.id;
+            let link = `https://t.me/AdMarket_Uzbot?start=${id}`;
+            tg.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(link)}&text=Har bir do'st uchun 80 olmos oling!`);
+        }
+    </script>
 </body>
 </html>
