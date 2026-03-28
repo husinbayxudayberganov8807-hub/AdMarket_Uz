@@ -53,17 +53,17 @@
 
     <div class="invite-banner" onclick="shareInvite()">
         🚀 DO'STLARNI TAKLIF QILISH<br>
-        <span style="font-size: 12px;">Har bir do'st uchun +50 💎</span>
+        <span style="font-size: 12px;">Har bir do'st uchun +80 💎 Do'stinggizga +30 💎</span>
     </div>
 
     <div class="section-title">Kunlik Vazifalar</div>
 
-    <div class="task-card" onclick="openLink('https://t.me/SizningKanaligiz')">
-        <div class="task-info">
-            <span class="task-name">📢 Kanalga a'zo bo'lish</span>
-            <span class="task-reward">+100 olmos</span>
-        </div>
-        <span>➜</span>
+    <div class="task-card" onclick="openLink('https://t.me/AdMarket_Uz')">
+    <div class="task-info">
+        <span class="task-name">📢 Kanalga a'zo bo'lish</span>
+        <span class="task-reward">+10 olmos</span>
+    </div>
+    <span>➜</span>
     </div>
 
     <div class="task-card" onclick="tgAlert('Tez kunda reklama qo\'shiladi')">
@@ -79,26 +79,27 @@
         <div class="nav-item" onclick="tgAlert('Ishlash bo\'limi')">💎<br>Ishlash</div>
         <div class="nav-item" onclick="tgAlert('Profil bo\'limi')">👤<br>Profil</div>
     </div>
+    
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
 
-    <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+    const urlParams = new URLSearchParams(window.location.search);
+    let balance = urlParams.get('bal') || 0;
+    document.getElementById("diamond-count").innerText = balance;
 
-        function shareInvite() {
-            let userId = tg.initDataUnsafe.user.id;
-            let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
-            let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=" + encodeURIComponent("Tezroq kiring, AdMarket botida olmos yig'ib kanalingizni reklama qiling!");
-            tg.openTelegramLink(shareUrl);
-        }
-
-        function openLink(url) {
-            tg.openTelegramLink(url);
-            tg.HapticFeedback.notificationOccurred('success');
-        }
-
-        function tgAlert(msg) {
-            tg.showAlert(msg);
-        }
-    </script>
+    function openLink(url) {
+        tg.openTelegramLink(url);
+        tg.HapticFeedback.notificationOccurred('success');
+        tg.showAlert("Kanalga a'zo bo'ling va botga qaytib /start bosing, shunda +10 💎 qo'shiladi!");
+    }
+    
+    function shareInvite() {
+        let userId = tg.initDataUnsafe.user.id;
+        let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
+        let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=Tezroq kiring, olmos yig'ing!";
+        tg.openTelegramLink(shareUrl);
+    }
+</script>
 </body>
 </html>
