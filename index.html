@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ADMARKET UZ</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         :root {
             --bg-dark: #020617;
@@ -711,6 +713,71 @@
 
         // Dastlabki ishga tushirish
         updateUI();
+        // 2. Firebase Sozlamalari (Buni o'zingizniki bilan almashtiring)
+        const firebaseConfig = {
+            apiKey: "SIZNING_API_KALITINGIZ",
+            authDomain: "loyiha-nomi.firebaseapp.com",
+            databaseURL: "https://loyiha-nomi-default-rtdb.firebaseio.com",
+            projectId: "loyiha-nomi",
+            storageBucket: "loyiha-nomi.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456:web:abcdef"
+        };
+
+        // Firebase-ni ishga tushirish
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // 3. Kanallarni onlayn bazaga yuborish funksiyasi
+        function orderNow() {
+            let name = document.getElementById('c-name').value;
+            let link = document.getElementById('c-link').value;
+            let count = document.getElementById('c-count').value;
+            let cost = count * 5;
+
+            if (d >= cost && name && link) {
+                d -= cost; // Olmosni ayiramiz
+
+                // FIREBASE-GA YUBORISH (Mana shu qism hammaning telefonida ko'rinishini ta'minlaydi)
+                database.ref('tasks').push({
+                    title: name,
+                    link: link.startsWith('@') ? `https://t.me/${link.substring(1)}` : link,
+                    reward: 10,
+                    timestamp: Date.now()
+                });
+
+                updateUI();
+                tg.showAlert("✅ Kanal hamma foydalanuvchilarga yuborildi!");
+            } else {
+                tg.showAlert("❌ Mablag' yetarli emas yoki ma'lumot xato!");
+            }
+        }
+
+        // 4. Bazadagi kanallarni real vaqtda o'qib olish
+        database.ref('tasks').on('value', (snapshot) => {
+            const tasks = snapshot.val();
+            let container = document.getElementById('work-mavjud');
+            container.innerHTML = ""; // Oldingilarni tozalash
+
+            if (tasks) {
+                for (let id in tasks) {
+                    let task = tasks[id];
+                    // Agar foydalanuvchi bu vazifani bajarmagan bo'lsa ko'rsatamiz
+                    if (!completedTasks.includes(id)) {
+                        container.innerHTML += `
+            <div class="task-card">
+              <div><b>${task.title}</b><br><span style="color:var(--main-blue);">+${task.reward} 💎</span></div>
+              <div style="display:flex; gap:5px;">
+                <button class="btn-action btn-go" onclick="window.open('${task.link}'); unlockCheck('${id}')">O'TISH</button>
+                <button id="check-${id}" class="btn-action btn-check" onclick="doTask('${id}', ${task.reward})" disabled style="opacity:0.5;">TEKSHIRISH</button>
+              </div>
+            </div>`;
+                    }
+                }
+            } else {
+                container.innerHTML = "<p>Hozircha vazifalar yo'q</p>";
+            }
+        });
     </script>
 </body>
 
