@@ -4,30 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdMarket Uz</title>
-    <script>
-    let tg = window.Telegram.WebApp;
-    tg.expand();
-
-    // Linkdan balansni o'qib olish
-    const urlParams = new URLSearchParams(window.location.search);
-    let balance = urlParams.get('bal') || 0;
-    
-    // Ekranda balansni yangilash
-    document.getElementById("diamond-count").innerText = balance;
-
-    function shareInvite() {
-        let userId = tg.initDataUnsafe.user.id;
-        let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
-        let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=Tezroq kiring, har bir taklif uchun olmos oling!";
-        tg.openTelegramLink(shareUrl);
-    }
-
-    function openLink(url) {
-        tg.openTelegramLink(url);
-        tg.HapticFeedback.notificationOccurred('success');
-        tg.showAlert("Kanalga a'zo bo'lganingizdan so'ng botni qayta ishga tushiring (restart), shunda 10 olmos qo'shiladi!");
-    }
-</script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             background-color: #050a18;
@@ -104,24 +81,28 @@
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        tg.expand();
+    let tg = window.Telegram.WebApp;
+    tg.expand();
 
-        function shareInvite() {
-            let userId = tg.initDataUnsafe.user.id;
-            let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
-            let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=" + encodeURIComponent("Tezroq kiring, AdMarket botida olmos yig'ib kanalingizni reklama qiling!");
-            tg.openTelegramLink(shareUrl);
-        }
+    // Linkdan balansni o'qib olish
+    const urlParams = new URLSearchParams(window.location.search);
+    let balance = urlParams.get('bal') || 0;
+    
+    // Ekranda balansni yangilash
+    document.getElementById("diamond-count").innerText = balance;
 
-        function openLink(url) {
-            tg.openTelegramLink(url);
-            tg.HapticFeedback.notificationOccurred('success');
-        }
+    function shareInvite() {
+        let userId = tg.initDataUnsafe.user.id;
+        let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
+        let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=Tezroq kiring, har bir taklif uchun olmos oling!";
+        tg.openTelegramLink(shareUrl);
+    }
 
-        function tgAlert(msg) {
-            tg.showAlert(msg);
-        }
+    function openLink(url) {
+        tg.openTelegramLink(url);
+        tg.HapticFeedback.notificationOccurred('success');
+        tg.showAlert("Kanalga a'zo bo'lganingizdan so'ng botni qayta ishga tushiring (restart), shunda 10 olmos qo'shiladi!");
+    }
     </script>
 </body>
 </html>
