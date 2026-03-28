@@ -12,28 +12,37 @@
             font-family: 'Segoe UI', sans-serif;
             margin: 0; padding: 15px;
             text-align: center;
-            overflow: hidden; /* Skroll bo'lmasligi uchun */
         }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .balance { 
             background: #0f172a; padding: 8px 15px; border-radius: 20px; 
             border: 1px solid #00d2ff; font-weight: bold; font-size: 14px;
         }
-        .main-btn {
-            background: #0f172a; border: 1px solid #1e293b; border-radius: 15px;
-            padding: 20px; margin-bottom: 12px; display: flex;
-            justify-content: space-between; align-items: center;
-            transition: 0.2s; cursor: pointer;
-        }
-        .main-btn:active { border-color: #00d2ff; transform: scale(0.96); background: #1e293b; }
+        .section-title { text-align: left; font-size: 14px; color: #64748b; margin-bottom: 10px; text-transform: uppercase; }
         
+        .task-card {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 15px;
+            padding: 15px; margin-bottom: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+            cursor: pointer;
+        }
+        .task-info { text-align: left; }
+        .task-name { display: block; font-weight: bold; font-size: 15px; }
+        .task-reward { color: #00ff00; font-size: 13px; }
+
         .footer {
             position: fixed; bottom: 0; left: 0; width: 100%;
             background: #0a1120; display: flex; justify-content: space-around;
             padding: 15px 0; border-top: 1px solid #1e293b;
         }
-        .nav-item { font-size: 12px; color: #64748b; cursor: pointer; }
+        .nav-item { font-size: 12px; color: #64748b; }
         .nav-item.active { color: #00d2ff; }
+        
+        .invite-banner {
+            background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+            border-radius: 15px; padding: 20px; margin-bottom: 25px;
+            color: white; font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -42,13 +51,26 @@
         <div class="balance">💎 <span id="diamond-count">0</span> | 🪙 0</div>
     </div>
 
-    <div class="main-btn" onclick="addDiamond()">
-        <span>💎 Olmos yig'ish (Clicker)</span>
-        <span>+1</span>
+    <div class="invite-banner" onclick="shareInvite()">
+        🚀 DO'STLARNI TAKLIF QILISH<br>
+        <span style="font-size: 12px;">Har bir do'st uchun +50 💎</span>
     </div>
 
-    <div class="main-btn" onclick="tgAlert('Tez kunda...')">
-        <span>🚀 Telegram Boost</span>
+    <div class="section-title">Kunlik Vazifalar</div>
+
+    <div class="task-card" onclick="openLink('https://t.me/SizningKanaligiz')">
+        <div class="task-info">
+            <span class="task-name">📢 Kanalga a'zo bo'lish</span>
+            <span class="task-reward">+100 olmos</span>
+        </div>
+        <span>➜</span>
+    </div>
+
+    <div class="task-card" onclick="tgAlert('Tez kunda reklama qo\'shiladi')">
+        <div class="task-info">
+            <span class="task-name">📺 Reklama ko'rish</span>
+            <span class="task-reward">+10 olmos</span>
+        </div>
         <span>➜</span>
     </div>
 
@@ -60,18 +82,18 @@
 
     <script>
         let tg = window.Telegram.WebApp;
-        tg.expand(); // Ilovani to'liq ochish
-        
-        let count = 0;
+        tg.expand();
 
-        function addDiamond() {
-            count++;
-            document.getElementById("diamond-count").innerText = count;
-            
-            // Telefonni titratish (Vibratsiya)
-            if (tg.HapticFeedback) {
-                tg.HapticFeedback.impactOccurred('medium');
-            }
+        function shareInvite() {
+            let userId = tg.initDataUnsafe.user.id;
+            let inviteLink = "https://t.me/AdMarket_Uzbot?start=" + userId;
+            let shareUrl = "https://t.me/share/url?url=" + encodeURIComponent(inviteLink) + "&text=" + encodeURIComponent("Tezroq kiring, AdMarket botida olmos yig'ib kanalingizni reklama qiling!");
+            tg.openTelegramLink(shareUrl);
+        }
+
+        function openLink(url) {
+            tg.openTelegramLink(url);
+            tg.HapticFeedback.notificationOccurred('success');
         }
 
         function tgAlert(msg) {
