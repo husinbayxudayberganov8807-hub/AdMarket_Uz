@@ -405,13 +405,16 @@
     }
 
     function markAuth(type) {
-        auth[type] = true;
-        if(auth.tg && auth.yt) {
-            let b = document.getElementById('enter-btn');
-            b.disabled = false; b.style.background = "var(--main-blue)";
-            b.style.color = "#000"; b.innerText = "DAVOM ETISH";
-        }
+    auth[type] = true;
+    // Faqat Telegram (tg) bajarilgan bo'lsa kifoya
+    if(auth.tg) { 
+        let b = document.getElementById('enter-btn');
+        b.disabled = false; 
+        b.style.background = "var(--main-blue)";
+        b.style.color = "#000"; 
+        b.innerText = "DAVOM ETISH";
     }
+}
 
     function enterApp() {
         document.getElementById('auth-overlay').style.display = 'none';
