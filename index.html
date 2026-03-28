@@ -7,65 +7,76 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            background-color: #050a18; /* Sizning logodagi to'q ko'k */
+            background-color: #050a18;
             color: white;
-            font-family: sans-serif;
-            margin: 0;
-            padding: 15px;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0; padding: 15px;
             text-align: center;
+            overflow: hidden; /* Skroll bo'lmasligi uchun */
         }
-        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        .balance { background: #0f172a; padding: 10px; border-radius: 10px; border: 1px solid #00d2ff; }
-        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .balance { 
+            background: #0f172a; padding: 8px 15px; border-radius: 20px; 
+            border: 1px solid #00d2ff; font-weight: bold; font-size: 14px;
+        }
         .main-btn {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 15px;
+            padding: 20px; margin-bottom: 12px; display: flex;
+            justify-content: space-between; align-items: center;
+            transition: 0.2s; cursor: pointer;
         }
-        .main-btn:active { border-color: #00d2ff; transform: scale(0.98); }
+        .main-btn:active { border-color: #00d2ff; transform: scale(0.96); background: #1e293b; }
         
         .footer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #0a1120;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px 0;
-            border-top: 1px solid #1e293b;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: #0a1120; display: flex; justify-content: space-around;
+            padding: 15px 0; border-top: 1px solid #1e293b;
         }
+        .nav-item { font-size: 12px; color: #64748b; cursor: pointer; }
+        .nav-item.active { color: #00d2ff; }
     </style>
 </head>
 <body>
     <div class="header">
-        <b style="color: #00d2ff;">ADMARKET UZ</b>
-        <div class="balance">💎 0 | 🪙 0</div>
+        <b style="color: #00d2ff; font-size: 18px;">ADMARKET UZ</b>
+        <div class="balance">💎 <span id="diamond-count">0</span> | 🪙 0</div>
     </div>
 
-    <div class="main-btn">
-        <span>🚀 Telegram Boost</span>
-        <span>➜</span>
+    <div class="main-btn" onclick="addDiamond()">
+        <span>💎 Olmos yig'ish (Clicker)</span>
+        <span>+1</span>
     </div>
-    <div class="main-btn">
-        <span>📸 Instagram Boost</span>
+
+    <div class="main-btn" onclick="tgAlert('Tez kunda...')">
+        <span>🚀 Telegram Boost</span>
         <span>➜</span>
     </div>
 
     <div class="footer">
-        <span style="color: #00d2ff;">🚀 Boost</span>
-        <span>💎 Ishlash</span>
-        <span>👤 Profil</span>
+        <div class="nav-item active">🚀<br>Boost</div>
+        <div class="nav-item" onclick="tgAlert('Ishlash bo\'limi')">💎<br>Ishlash</div>
+        <div class="nav-item" onclick="tgAlert('Profil bo\'limi')">👤<br>Profil</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand(); // Ilovani to'liq ochish
+        
+        let count = 0;
+
+        function addDiamond() {
+            count++;
+            document.getElementById("diamond-count").innerText = count;
+            
+            // Telefonni titratish (Vibratsiya)
+            if (tg.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function tgAlert(msg) {
+            tg.showAlert(msg);
+        }
     </script>
 </body>
 </html>
