@@ -453,6 +453,7 @@
             </div>
 
             <div id="work-yaratish" style="display: none; padding: 10px;">
+                <input type="text" id="c-name" placeholder="Kanal yoki guruh nomi">
                 <input type="text" id="c-link" placeholder="Kanal linki (@username)">
                 <input type="number" id="c-count" placeholder="Odam soni" oninput="recalc()">
                 <p style="text-align: center;">Narxi: <span id="c-price"
@@ -514,22 +515,22 @@
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-    
+
         // 1. MA'LUMOTLARNI SAQLASH VA YUKLASH (YANGILANDI)
         let d = parseInt(localStorage.getItem('d_bal')) || 0;
         let c = parseInt(localStorage.getItem('c_bal')) || 0;
         let usedCodes = JSON.parse(localStorage.getItem('used_promos_map')) || {};
         let myOrders = JSON.parse(localStorage.getItem('my_orders')) || [];
         let refUsed = localStorage.getItem('ref_used') || "false";
-        
+
         // YANGI: Global vazifalar (boshqalar ko'rishi uchun) va bajarilganlar ro'yxati
         let globalTasks = JSON.parse(localStorage.getItem('global_tasks')) || [
             { id: 'task-1', title: '@AdMarket_Uz', link: 'https://t.me/AdMarket_Uz', reward: 10 }
         ];
         let completedTasks = JSON.parse(localStorage.getItem('completed_tasks')) || [];
-    
+
         let taskOk = {};
-    
+
         function generateUserCode() {
             let code = localStorage.getItem('user_invite_code');
             if (!code) {
@@ -542,36 +543,36 @@
             }
             return code;
         }
-    
+
         // 2. UI YANGILASH (YANGILANDI)
         function updateUI() {
             document.getElementById('bal-top').innerText = d.toLocaleString();
             document.getElementById('coin-top').innerText = c.toLocaleString();
             document.getElementById('my-invite-code').innerText = generateUserCode();
-    
+
             localStorage.setItem('d_bal', d);
             localStorage.setItem('c_bal', c);
             localStorage.setItem('used_promos_map', JSON.stringify(usedCodes));
             localStorage.setItem('my_orders', JSON.stringify(myOrders));
             localStorage.setItem('ref_used', refUsed);
-            
+
             // YANGI: Vazifalarni saqlash
             localStorage.setItem('global_tasks', JSON.stringify(globalTasks));
             localStorage.setItem('completed_tasks', JSON.stringify(completedTasks));
-    
+
             renderOrders();
             renderMavjudTasks(); // Mavjud vazifalarni har doim qayta chizish
         }
-    
+
         // 3. MAVJUD VAZIFALARNI CHIZISH (YANGI FUNKSIYA)
         function renderMavjudTasks() {
             let container = document.getElementById('work-mavjud');
-            container.innerHTML = ""; 
-    
+            container.innerHTML = "";
+
             globalTasks.forEach(task => {
                 // Agar vazifa bajarilgan bo'lsa, uni ko'rsatmaymiz
                 if (completedTasks.includes(task.id)) return;
-    
+
                 container.innerHTML += `
                     <div id="${task.id}" class="task-card">
                         <div><b>${task.title}</b><br><span style="color:var(--main-blue); font-size:12px;">+${task.reward} olmos</span></div>
@@ -582,44 +583,52 @@
                     </div>`;
             });
         }
-    
+
         // 4. BUYURTMA BERISH (YANGILANDI)
         function orderNow() {
+            let nameInput = document.getElementById('c-name').value; // Nomni olish
             let linkInput = document.getElementById('c-link').value;
             let n = document.getElementById('c-count').value;
             let cost = n * 5;
-    
-            if (d >= cost && cost > 0 && linkInput.length > 2) {
+
+            // Nom kiritilganini ham tekshiramiz
+            if (d >= cost && cost > 0 && linkInput.length > 2 && nameInput.length > 1) {
                 d -= cost;
-                
+
                 let taskID = 'task-' + Math.floor(Math.random() * 1000000);
                 let formattedLink = linkInput.startsWith('@') ? `https://t.me/${linkInput.substring(1)}` : linkInput;
-    
+
                 // Buyurtmalarim ro'yxatiga qo'shish
                 let newOrder = {
                     id: Math.floor(10000 + Math.random() * 90000),
-                    link: linkInput, count: n, date: new Date().toLocaleDateString()
+                    title: nameInput, // Link o'rniga nomni saqlaymiz
+                    link: linkInput,
+                    count: n,
+                    date: new Date().toLocaleDateString()
                 };
                 myOrders.unshift(newOrder);
-    
-                // "MAVJUD" bo'limiga ham qo'shish
+
+                // "MAVJUD" bo'limiga qo'shish (Endi title sifatida nameInput ishlatiladi)
                 globalTasks.push({
                     id: taskID,
-                    title: linkInput,
+                    title: nameInput, // BU YERDA HAQIQIY NOM CHIQADI
                     link: formattedLink,
                     reward: 10
                 });
-    
+
                 updateUI();
-                tg.showAlert("✅ Buyurtma qabul qilindi va 'Mavjud' bo'limiga qo'shildi!");
+                tg.showAlert("✅ Buyurtma qabul qilindi!");
+
+                // Inputlarni tozalash
+                document.getElementById('c-name').value = "";
                 document.getElementById('c-count').value = "";
                 document.getElementById('c-link').value = "";
                 recalc();
-            } else { 
-                tg.showAlert("❌ Mablag' yetarli emas yoki ma'lumot xato!"); 
+            } else {
+                tg.showAlert("❌ Ma'lumotlarni to'liq kiriting!");
             }
         }
-    
+
         // 5. VAZIFANI BAJARISH (YANGILANDI)
         function doTask(id, amt) {
             if (taskOk[id]) {
@@ -629,33 +638,33 @@
                 tg.showAlert("✅ +" + amt + " 💎");
             }
         }
-    
+
         // Qolgan funksiyalar o'zgarishsiz qoladi...
         function unlockCheck(id) {
             taskOk[id] = true;
             let b = document.getElementById('check-' + id);
-            if(b) { b.disabled = false; b.style.opacity = "1"; }
+            if (b) { b.disabled = false; b.style.opacity = "1"; }
         }
-    
+
         function recalc() {
             let n = document.getElementById('c-count').value || 0;
             document.getElementById('c-price').innerText = (n * 5).toLocaleString();
         }
-    
+
         function switchMain(id, el) {
             document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
             document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             el.classList.add('active');
         }
-    
+
         function showWork(t) {
             document.getElementById('work-mavjud').style.display = t === 'mavjud' ? 'block' : 'none';
             document.getElementById('work-yaratish').style.display = t === 'yaratish' ? 'block' : 'none';
             document.getElementById('btn-m').classList.toggle('active', t === 'mavjud');
             document.getElementById('btn-y').classList.toggle('active', t === 'yaratish');
         }
-    
+
         // Boshqa modal funksiyalaringiz (openExchange, closeExchange va hkz) shu yerda tursin...
         function openExchange() { document.getElementById('exchange-modal').style.display = 'flex'; }
         function closeExchange() { document.getElementById('exchange-modal').style.display = 'none'; }
@@ -671,7 +680,7 @@
         function closeBonus() { document.getElementById('bonus-modal').style.display = 'none'; }
         function openTransfer() { document.getElementById('transfer-modal').style.display = 'flex'; }
         function closeTransfer() { document.getElementById('transfer-modal').style.display = 'none'; }
-    
+
         function renderOrders() {
             let list = document.getElementById('orders-list');
             if (myOrders.length === 0) {
@@ -681,18 +690,17 @@
             list.innerHTML = myOrders.map(order => `
                 <div class="order-card">
                     <div class="order-id">#${order.id}</div>
-                    <div class="order-title">TELEGRAM OBUNA</div>
-                    <div class="order-link">${order.link}</div>
+                    <div class="order-title">${order.title}</div> <div class="order-link">${order.link}</div>
                     <div class="order-info">${order.count} ta • ${order.date}</div>
                     <div class="order-status">BAJARILMOQDA</div>
                 </div>`).join('');
         }
-    
+
         function enterApp() {
             document.getElementById('auth-overlay').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
         }
-    
+
         // Profil ma'lumotlari
         let user = tg.initDataUnsafe.user;
         if (user) {
@@ -700,7 +708,7 @@
             document.getElementById('u-p-id').innerText = "ID: " + user.id;
             document.getElementById('u-p-img').src = user.photo_url || "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
         }
-    
+
         // Dastlabki ishga tushirish
         updateUI();
     </script>
